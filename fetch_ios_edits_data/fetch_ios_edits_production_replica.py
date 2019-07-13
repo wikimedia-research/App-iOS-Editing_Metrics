@@ -44,6 +44,7 @@ SUBSTR(r.rev_timestamp, 0, 8) AS `date`,
 r.wiki_db AS wiki,
 r.rev_user AS local_user_id,
 COALESCE(IF(r.rev_user = 0, MD5(CONCAT(c.cuc_ip, c.cuc_agent)), r.rev_user_text), r.rev_user_text) AS username,
+-- rev_user and rev_user_text are deprecated and replaced by revision_actor_temp table since May 30th, but revision_actor_temp is not in data lake at the moment
 CASE WHEN INSTR(c.cuc_agent, 'Tablet') > 0 THEN 'iPad'
      WHEN INSTR(c.cuc_agent, 'Phone') > 0 THEN 'iPhone'
      ELSE NULL END AS device,

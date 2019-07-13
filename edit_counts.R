@@ -18,9 +18,27 @@ p <- daily_edit_counts %>%
   annotate("text", x = wikitext_release-3, y = 500, label = "Wikitext editing tools released", angle = 90) +
   wmf::theme_min() +
   labs(title = "Number of edits on the iOS app, by project")
-ggsave("all_ios_edits_byproj.png", p, path = 'figures', units = "in", dpi = 300, height = 6, width = 10)
+ggsave("all_ios_edits_byproj.png", p, path = 'figures', units = "in", dpi = 300, height = 6, width = 12)
+p <- daily_edit_counts %>%
+  mutate(month = floor_date(date, "month")) %>%
+  group_by(month, project) %>%
+  summarize(edit_counts = sum(edit_counts)) %>%
+  ggplot(aes(x=month, y=edit_counts, fill=project)) +
+  geom_bar(stat="identity") +
+  scale_x_date(name = "Month", date_labels = "%Y-%m") +
+  scale_y_continuous(name = "Number of edits") +
+  scale_fill_brewer("Project", palette = "Paired") +
+  geom_vline(xintercept = as.numeric(wikidata_release),
+             linetype = "dashed", color = "black") +
+  geom_vline(xintercept = as.numeric(wikitext_release),
+             linetype = "dashed", color = "black") +
+  annotate("text", x = wikidata_release-3, y = 15000, label = "Wikidata description edit released", angle = 90) +
+  annotate("text", x = wikitext_release-3, y = 15000, label = "Wikitext editing tools released", angle = 90) +
+  wmf::theme_min() +
+  labs(title = "Number of edits on the iOS app, by project")
+ggsave("all_ios_edits_byproj_bar.png", p, path = 'figures', units = "in", dpi = 300, height = 6, width = 12)
 
-# 30 days before and after
+# 30 days before and after release
 daily_edit_counts %>%
   filter(date >= wikitext_release, date < wikitext_release+30) %>%
   group_by(project) %>%
@@ -42,7 +60,7 @@ daily_edit_counts %>%
   mutate(mom = edit_counts/lag(edit_counts)-1)
 # By quarter
 daily_edit_counts %>%
-  mutate(quarter = quarter(date)) %>%
+  mutate(quarter = quarter(date)) %>% # calendar quarter
   group_by(quarter) %>%
   summarize(edit_counts = sum(edit_counts)) %>%
   mutate(qoq = edit_counts/lag(edit_counts)-1)
@@ -59,7 +77,7 @@ daily_edit_counts_other <- all_ios_edits %>%
   mutate(project = ifelse(wiki_group=="wikidata", "Wikidata description", "Wikipedia")) %>%
   group_by(date, project) %>%
   summarize(edit_counts = n())
-# 30 days before and after
+# 30 days before and after release
 daily_edit_counts_other %>%
   filter(date >= wikitext_release, date < wikitext_release+30) %>%
   group_by(project) %>%
@@ -94,7 +112,6 @@ daily_edit_counts_other %>%
 
 # By login status
 edits_by_login <- all_ios_edits %>%
-  filter(!is.na(local_user_id)) %>%
   mutate(is_anon = local_user_id == 0,
          project = ifelse(wiki_group=="wikidata", "Wikidata description", "Wikipedia")) %>%
   group_by(date, project, is_anon) %>%
@@ -117,6 +134,25 @@ p <- edits_by_login %>%
   wmf::theme_min() +
   labs(title = "Number of edits on the iOS app, by login status")
 ggsave("all_ios_edits_bylogin.png", p, path = 'figures', units = "in", dpi = 300, height = 6, width = 10)
+p <- edits_by_login %>%
+  mutate(month = floor_date(date, "month"),
+         is_anon = ifelse(is_anon, "Anonymous", "Non-anonymous")) %>%
+  group_by(month, is_anon) %>%
+  summarize(edit_counts = sum(edit_counts)) %>%
+  ggplot(aes(x=month, y=edit_counts, fill=is_anon)) +
+  geom_bar(stat="identity") +
+  scale_x_date(name = "Month", date_labels = "%Y-%m") +
+  scale_y_continuous(name = "Number of edits") +
+  scale_fill_brewer("Edit Type", palette = "Pastel1") +
+  geom_vline(xintercept = as.numeric(wikidata_release),
+             linetype = "dashed", color = "black") +
+  geom_vline(xintercept = as.numeric(wikitext_release),
+             linetype = "dashed", color = "black") +
+  annotate("text", x = wikidata_release-3, y = 15000, label = "Wikidata description edit released", angle = 90) +
+  annotate("text", x = wikitext_release-3, y = 15000, label = "Wikitext editing tools released", angle = 90) +
+  wmf::theme_min() +
+  labs(title = "Number of edits on the iOS app, by login status")
+ggsave("all_ios_edits_bylogin_bar.png", p, path = 'figures', units = "in", dpi = 300, height = 6, width = 12)
 
 p <- edits_by_login %>%
   filter(project == "Wikipedia") %>%
@@ -136,6 +172,7 @@ p <- edits_by_login %>%
   labs(title = "Number of Wikipedia edits on the iOS app, by login status")
 ggsave("wikipedia_edits_bylogin.png", p, path = 'figures', units = "in", dpi = 300, height = 6, width = 10)
 
+# 30 days before and after release
 anchor <- seq(from =wikitext_release-30*7, to=wikitext_release+30, by=30)
 edits_by_login %>%
   filter(project == "Wikipedia") %>%
@@ -145,6 +182,7 @@ edits_by_login %>%
   summarize(edit_counts = sum(edit_counts))
 
 # Number of edits by device
+# No device info for edits made after 2019-04-01
 
 edits_by_device <- all_ios_edits %>%
   filter(date>=as.Date("2018-09-12")) %>%

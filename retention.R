@@ -41,13 +41,13 @@ monthly_retention_rate <- user_retention %>%
   mutate(survival_end_month = floor_date(first_ios_edit_date + 60, "month")) %>%
   group_by(survival_end_month) %>%
   summarize(`Second 30 days Retention` = mean(retained_30, na.rm = TRUE)) %>%
-  filter(survival_end_month >= as.Date("2018-09-01"), survival_end_month < as.Date("2019-04-01")) %>%
+  filter(survival_end_month >= as.Date("2018-09-01"), survival_end_month < as.Date("2019-07-01")) %>%
   right_join({
     user_retention %>%
       mutate(survival_end_month = floor_date(first_ios_edit_date + 30, "month")) %>%
       group_by(survival_end_month) %>%
       summarize(`Second 15 days Retention` = mean(retained_15, na.rm = TRUE)) %>%
-      filter(survival_end_month >= as.Date("2018-08-01"), survival_end_month < as.Date("2019-04-01"))
+      filter(survival_end_month >= as.Date("2018-08-01"), survival_end_month < as.Date("2019-07-01"))
   }, by = "survival_end_month")
 
 p <- monthly_retention_rate %>%
@@ -97,25 +97,25 @@ user_retention %>%
   mutate(survival_end_quarter = floor_date(first_ios_edit_date + 60, "quarter")) %>%
   group_by(survival_end_quarter) %>%
   summarize(`Second 30 days Retention` = mean(retained_30, na.rm = TRUE)) %>%
-  filter(survival_end_quarter >= as.Date("2018-09-01"), survival_end_quarter < as.Date("2019-04-01")) %>%
+  filter(survival_end_quarter >= as.Date("2018-09-01"), survival_end_quarter < as.Date("2019-07-01")) %>%
   right_join({
     user_retention %>%
       mutate(survival_end_quarter = floor_date(first_ios_edit_date + 30, "quarter")) %>%
       group_by(survival_end_quarter) %>%
       summarize(`Second 15 days Retention` = mean(retained_15, na.rm = TRUE)) %>%
-      filter(survival_end_quarter >= as.Date("2018-08-01"), survival_end_quarter < as.Date("2019-04-01"))
+      filter(survival_end_quarter >= as.Date("2018-08-01"), survival_end_quarter < as.Date("2019-07-01"))
   }, by = "survival_end_quarter")
 user_retention_no_en %>%
   mutate(survival_end_quarter = floor_date(first_ios_edit_date + 60, "quarter")) %>%
   group_by(survival_end_quarter) %>%
   summarize(`Second 30 days Retention` = mean(retained_30, na.rm = TRUE)) %>%
-  filter(survival_end_quarter >= as.Date("2018-09-01"), survival_end_quarter < as.Date("2019-04-01")) %>%
+  filter(survival_end_quarter >= as.Date("2018-09-01"), survival_end_quarter < as.Date("2019-07-01")) %>%
   right_join({
     user_retention_no_en %>%
       mutate(survival_end_quarter = floor_date(first_ios_edit_date + 30, "quarter")) %>%
       group_by(survival_end_quarter) %>%
       summarize(`Second 15 days Retention` = mean(retained_15, na.rm = TRUE)) %>%
-      filter(survival_end_quarter >= as.Date("2018-08-01"), survival_end_quarter < as.Date("2019-04-01"))
+      filter(survival_end_quarter >= as.Date("2018-08-01"), survival_end_quarter < as.Date("2019-07-01"))
   }, by = "survival_end_quarter")
 
 
